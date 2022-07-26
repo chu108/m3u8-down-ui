@@ -18,11 +18,24 @@ tauri-build = { version = "1.0.4", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.5", features = ["api-all", "system-tray"] }
+anyhow = "1.0"
+clap = { version = "3.2.14", features = ["derive"] }
+headless_chrome = "0.9"
+kdam = "0.2"
+m3u8-rs = "4.0"
+openssl = "0.10"
+regex = "1.6.0"
+requestty = "0.4.1"
+reqwest = { version = "0.11", features = ["blocking", "cookies"] }
+terminal_size = "0.2"
+threadpool = "1.8.1"
+once_cell = "1.13.0"
 
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
-default = [ "custom-protocol" ]
+default = [ "custom-protocol", "reqwest/native-tls-vendored" ]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
+rustls-tls = ["reqwest/rustls-tls"]
