@@ -12,7 +12,7 @@ fn main() {
     tauri::Builder::default()
         .on_page_load(move |_window, _payload| {
             println!("on_page_load........................");
-            // handle::download(_window);
+            handle::upWatch(_window);
         })
         .setup(move |app| {
             println!("setup........................");

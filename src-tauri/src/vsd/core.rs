@@ -1,30 +1,18 @@
 use std::sync::{Arc, Mutex};
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result, Ok};
 use kdam::prelude::BarMethods;
 use kdam::term::Colorizer;
 
 use crate::vsd::merger::BinarySequence;
-use crate::vsd::parse;
+use crate::vsd::{parse, PROGMAP};
 use crate::vsd::progress::{DownloadProgress, StreamData};
 use crate::vsd::utils::*;
-use once_cell::sync::Lazy;
-
-pub struct Progress {
-    pub total: usize,
-    pub downloaded: usize,
-}
-
-pub static PROG: Lazy<Mutex<Progress>> = Lazy::new(|| {
-    let prog = Progress{total: 0, downloaded: 0};
-    Mutex::new(prog)
-});
 
 pub struct DownloadState {
     args: crate::vsd::args::Args,
     downloader: crate::vsd::downloader::Downloader,
-    pub progress: DownloadProgress,
-    pub speed: Arc<Mutex<Progress>>,
+    progress: DownloadProgress,
 }
 
 impl DownloadState {
@@ -73,8 +61,7 @@ impl DownloadState {
         Ok(Self {
             args,
             downloader,
-            progress: DownloadProgress::new_empty(),
-            speed: Arc::new(Mutex::new(Progress{total:0, downloaded:0}))
+            progress: DownloadProgress::new_empty()
         })
     }
 
@@ -437,8 +424,9 @@ impl DownloadState {
         )));
         let client = Arc::new(self.downloader.clone());
         let pool = threadpool::ThreadPool::new(self.args.threads as usize);
-        PROG.lock().unwrap().total = total;
-        PROG.lock().unwrap().downloaded = 0;
+        {
+            PROGMAP.lock().unwrap().init(self.args.input.clone(), total, 0);
+        }
 
         for (i, segment) in segments.iter().enumerate() {
             if self.args.resume {
@@ -480,9 +468,6 @@ impl DownloadState {
                 format_bytes(merger_cm.estimate()).2
             ).as_str());
             pb.lock().unwrap().update_to(merger_cm.position());
-            PROG.lock().unwrap().downloaded = merger_cm.position();
-
-            let obj = self.speed.clone();
 
             pool.execute(move || {
                 let mut retries = 0;
@@ -570,9 +555,7 @@ impl DownloadState {
                     format_bytes(merger.estimate()).2
                 ).as_str());
                 pb.update(1);
-                PROG.lock().unwrap().downloaded += 1;
-
-                obj.lock().unwrap().downloaded += 1;
+                PROGMAP.lock().unwrap().set_download(1);
             });
         }
 
@@ -586,10 +569,12 @@ impl DownloadState {
                 tempfile.colorize("bold green")
             );
         } else {
-            bail!(
-                "File {} not downloaded successfully.",
-                tempfile.colorize("bold red")
-            );
+            // bail!(
+            //     "File {} not downloaded successfully.",
+            //     tempfile.colorize("bold red")
+            // );
+            println!("File {} not downloaded successfully.",tempfile.colorize("bold red"));
+            return Ok(());
         }
 
         Ok(())
@@ -634,7 +619,9 @@ impl DownloadState {
                 .wait()?;
 
             if !code.success() {
-                bail!("FFMPEG exited with code {}.", code.code().unwrap_or(1))
+                println!("FFMPEG exited with code {}.", code.code().unwrap_or(1));
+                return Ok(());
+                // bail!("FFMPEG exited with code {}.", code.code().unwrap_or(1))
             }
 
             if let Some(audio) = &self.progress.audio {
