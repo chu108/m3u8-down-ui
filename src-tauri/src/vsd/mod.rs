@@ -1,6 +1,3 @@
-use ::core::time;
-use std::{thread::{self, sleep}, collections::HashMap, panic};
-
 pub mod args;
 pub mod downloader;
 pub mod merger;
@@ -12,7 +9,7 @@ pub mod parse;
 
 use once_cell::sync::Lazy;
 use serde::{Serialize, Deserialize};
-use std::sync::{Arc, Mutex};
+use std::sync::{RwLock};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Progress {
@@ -60,31 +57,20 @@ impl Progress{
         self.output = "".to_string();
     }
 
-    pub fn finish(&mut self) -> bool {
+    pub fn finish(&self) -> bool {
         self.total > 0 && self.downloaded > 0 && self.total == self.downloaded
     }
 }
 
-pub static PROGMAP: Lazy<Mutex<Progress>> = Lazy::new(|| {
+pub static PROGMAP: Lazy<RwLock<Progress>> = Lazy::new(|| {
     let prog = Progress::new();
-    Mutex::new(prog)
+    RwLock::new(prog)
 });
 
-pub fn down(url: String, output: String) {
-    thread::spawn(||{
-        let result = panic::catch_unwind(||{
-            let mut downloader = core::DownloadState::new_url(url, output).unwrap_or_else(|e| utils::error(e));
-            let segments = downloader.segments().unwrap_or_else(|e| utils::error(e));
-            downloader.download(&segments, downloader.tempfile()).unwrap_or_else(|e| utils::error(e));
-            downloader.transmux_trancode().unwrap_or_else(|e| utils::error(e));
-        });
-        
-        if result.is_err() {
-            if let Some(segments) = result.err() {
-                println!("---------{:?}", segments);
-            };
-            PROGMAP.lock().unwrap().set_err("错误-----".to_string());
-        }
-    });
-    
+pub fn down(url: String, output: String) -> Result<(), anyhow::Error> {
+    let mut downloader = core::DownloadState::new_url(url, output)?;
+    let segments = downloader.segments()?;
+    downloader.download(&segments, downloader.tempfile())?;
+    downloader.transmux_trancode()?;
+    Ok(())
 }

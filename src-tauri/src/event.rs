@@ -26,6 +26,7 @@ pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
         }
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             "quit" => {
+                println!("进程退出3");
                 std::process::exit(0);
             }
             "hide" => {

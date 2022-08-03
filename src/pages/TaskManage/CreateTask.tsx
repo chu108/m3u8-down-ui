@@ -3,7 +3,7 @@ import model from "./model";
 import { useSnapshot } from "valtio";
 import { getNow } from "../../utils";
 
-const DEFAULT_TASK = { url: "", output: "" };
+const DEFAULT_TASK = { url: "http://1257120875.vod2.myqcloud.com/0ef121cdvodtransgzp1257120875/3055695e5285890780828799271/v.f230.m3u8", output: "11.MP4" };
 
 const CreateTask: React.FC = () => {
   const state = useSnapshot(model);
@@ -35,6 +35,7 @@ const CreateTask: React.FC = () => {
               aria-label="资源地址"
               color="primary"
               size="lg"
+              value={model.newTask!.url}
               placeholder="资源地址"
               onChange={(e) => (model.newTask!.url = e.target.value)}
             />
@@ -43,6 +44,7 @@ const CreateTask: React.FC = () => {
               bordered
               fullWidth
               aria-label="输出文件"
+              value={model.newTask!.output}
               color="primary"
               size="lg"
               placeholder="文件保存为"

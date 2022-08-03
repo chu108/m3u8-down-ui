@@ -1,13 +1,13 @@
 use std::sync::{Arc, Mutex};
 
-use anyhow::{anyhow, bail, Context, Result, Ok};
+use anyhow::{anyhow, bail, Context, Ok, Result};
 use kdam::prelude::BarMethods;
 use kdam::term::Colorizer;
 
 use crate::vsd::merger::BinarySequence;
-use crate::vsd::{parse, PROGMAP};
 use crate::vsd::progress::{DownloadProgress, StreamData};
 use crate::vsd::utils::*;
+use crate::vsd::{parse, PROGMAP};
 
 pub struct DownloadState {
     args: crate::vsd::args::Args,
@@ -16,7 +16,7 @@ pub struct DownloadState {
 }
 
 impl DownloadState {
-    pub fn new_url(url:String, output:String) -> Result<Self> {
+    pub fn new_url(url: String, output: String) -> Result<Self> {
         let args = crate::vsd::args::Args{
             input:url,
             output:Some(output),
@@ -36,7 +36,7 @@ impl DownloadState {
         };
         Self::new_obj(args)
     }
-    
+
     pub fn new() -> Result<Self> {
         let args = crate::vsd::args::parse();
         Self::new_obj(args)
@@ -61,7 +61,7 @@ impl DownloadState {
         Ok(Self {
             args,
             downloader,
-            progress: DownloadProgress::new_empty()
+            progress: DownloadProgress::new_empty(),
         })
     }
 
@@ -171,7 +171,7 @@ impl DownloadState {
         if self.args.input.ends_with(".mpd") {
             bail!("Dash streams are not supported.")
         }
-        
+
         Ok(())
     }
 
@@ -307,24 +307,28 @@ impl DownloadState {
         self.parse_playlist(content)
     }
 
-    pub fn segments_url(&mut self, url:String, output:String) -> Result<Vec<m3u8_rs::MediaSegment>> {
+    pub fn segments_url(
+        &mut self,
+        url: String,
+        output: String,
+    ) -> Result<Vec<m3u8_rs::MediaSegment>> {
         let content = if url.starts_with("http") {
-            if !url.split("?").next().unwrap().ends_with(".m3u8"){
+            if !url.split("?").next().unwrap().ends_with(".m3u8") {
                 self.scrape_website()?;
             }
             self.downloader.get_bytes(&url)?
         } else {
             std::fs::read_to_string(&url)?.as_bytes().to_vec()
         };
-        
+
         if !output.is_empty() {
             self.args.output = Some(output);
         }
-    
+
         self.parse_playlist(content)
     }
 
-    pub fn parse_playlist(&mut self, content:Vec<u8>) -> Result<Vec<m3u8_rs::MediaSegment>> {
+    pub fn parse_playlist(&mut self, content: Vec<u8>) -> Result<Vec<m3u8_rs::MediaSegment>> {
         match m3u8_rs::parse_playlist_res(&content)
             .map_err(|_| anyhow!("Couldn't parse {} playlist.", self.args.input))?
         {
@@ -424,9 +428,10 @@ impl DownloadState {
         )));
         let client = Arc::new(self.downloader.clone());
         let pool = threadpool::ThreadPool::new(self.args.threads as usize);
-        {
-            PROGMAP.lock().unwrap().init(self.args.input.clone(), total, 0);
-        }
+        PROGMAP
+            .write()
+            .unwrap()
+            .init(self.args.input.clone(), total, 0);
 
         for (i, segment) in segments.iter().enumerate() {
             if self.args.resume {
@@ -462,11 +467,14 @@ impl DownloadState {
             let merger_c = merger.clone();
             let merger_cm = merger_c.lock().unwrap();
 
-            pb.lock().unwrap().set_description(format!(
-                "{} / {}",
-                format_bytes(merger_cm.stored()).2,
-                format_bytes(merger_cm.estimate()).2
-            ).as_str());
+            pb.lock().unwrap().set_description(
+                format!(
+                    "{} / {}",
+                    format_bytes(merger_cm.stored()).2,
+                    format_bytes(merger_cm.estimate()).2
+                )
+                .as_str(),
+            );
             pb.lock().unwrap().update_to(merger_cm.position());
 
             pool.execute(move || {
@@ -485,20 +493,26 @@ impl DownloadState {
                         break resp.unwrap();
                     } else {
                         if total_retries > retries {
-                            pb.lock().unwrap().write(format!(
-                                "{} to download segment at index {}.",
-                                "RETRYING".colorize("bold yellow"),
-                                i
-                            ).as_str());
+                            pb.lock().unwrap().write(
+                                format!(
+                                    "{} to download segment at index {}.",
+                                    "RETRYING".colorize("bold yellow"),
+                                    i
+                                )
+                                .as_str(),
+                            );
                             retries += 1;
                             continue;
                         } else {
-                            pb.lock().unwrap().write(format!(
+                            pb.lock().unwrap().write(
+                                format!(
                                 "{}: Reached maximum number of retries for segment at index {}.",
                                 "Error".colorize("bold red"),
                                 i
-                            ).as_str());
-                            std::process::exit(1);
+                            )
+                                .as_str(),
+                            );
+                            // ;std::process::exit(1)
                         }
                     }
                 };
@@ -518,26 +532,31 @@ impl DownloadState {
                             .decrypt(&data);
 
                             break decrypted_data.unwrap_or_else(|e| {
-                                pb.lock().unwrap().write(format!(
-                                    "{}: {}",
-                                    "Error".colorize("bold red"),
-                                    e
-                                ).as_str());
+                                pb.lock().unwrap().write(
+                                    format!("{}: {}", "Error".colorize("bold red"), e).as_str(),
+                                );
+                                println!("进程退出1");
                                 std::process::exit(1);
                             });
                         } else {
                             if total_retries > retries {
-                                pb.lock().unwrap().write(format!(
-                                    "{} to download decryption key.",
-                                    "RETRYING".colorize("bold yellow"),
-                                ).as_str());
+                                pb.lock().unwrap().write(
+                                    format!(
+                                        "{} to download decryption key.",
+                                        "RETRYING".colorize("bold yellow"),
+                                    )
+                                    .as_str(),
+                                );
                                 retries += 1;
                                 continue;
                             } else {
-                                pb.lock().unwrap().write(format!(
-                                "{}: Reached maximum number of retries to download decryption key.",
-                                "Error".colorize("bold red"),
-                            ).as_str());
+                                pb.lock().unwrap().write(
+                                    format!(
+                                        "{}: Reached maximum number of retries to download decryption key.",
+                                        "Error".colorize("bold red"),
+                                    ).as_str(),
+                                );
+                                println!("进程退出2");
                                 std::process::exit(1);
                             }
                         }
@@ -549,13 +568,16 @@ impl DownloadState {
                 merger.flush().unwrap();
 
                 let mut pb = pb.lock().unwrap();
-                pb.set_description(format!(
-                    "{} / {}",
-                    format_bytes(merger.stored()).2,
-                    format_bytes(merger.estimate()).2
-                ).as_str());
+                pb.set_description(
+                    format!(
+                        "{} / {}",
+                        format_bytes(merger.stored()).2,
+                        format_bytes(merger.estimate()).2
+                    )
+                    .as_str(),
+                );
                 pb.update(1);
-                PROGMAP.lock().unwrap().set_download(1);
+                PROGMAP.write().unwrap().set_download(1);
             });
         }
 
@@ -569,12 +591,12 @@ impl DownloadState {
                 tempfile.colorize("bold green")
             );
         } else {
-            // bail!(
-            //     "File {} not downloaded successfully.",
-            //     tempfile.colorize("bold red")
-            // );
-            println!("File {} not downloaded successfully.",tempfile.colorize("bold red"));
-            return Ok(());
+            bail!(
+                "File {} not downloaded successfully.",
+                tempfile.colorize("bold red")
+            );
+            // println!("File {} not downloaded successfully.",tempfile.colorize("bold red"));
+            // return Ok(());
         }
 
         Ok(())

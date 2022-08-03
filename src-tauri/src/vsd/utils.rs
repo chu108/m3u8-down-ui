@@ -114,7 +114,11 @@ pub fn get_columns() -> u16 {
          .0
 }
 
-pub fn error(e: anyhow::Error) -> ! {
-    println!("{}: {}", "Error".colorize("bold red"), e);
-    std::process::exit(1);
+// pub fn error(e: anyhow::Error) -> ! {
+//     println!("{}: {}", "Error".colorize("bold red"), e);
+//     std::process::exit(1);
+// }
+
+pub fn err_to_str(e: anyhow::Error) -> String {
+    format!("Error: {}", e)
 }

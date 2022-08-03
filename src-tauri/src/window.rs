@@ -1,29 +1,6 @@
-use std::{thread::sleep, time::Duration, fs::File, path::Path};
+use std::{fs::File, path::Path};
 
 use tauri::{Manager, Window};
-
-pub fn update(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    println!("setup。。。。。。。。。。。");
-
-    // for (win_name, win) in app.windows() {
-    //     println!("{}, {}", win_name, win.label());
-    // }
-
-    // let handle = app.handle();
-    // std::thread::spawn(move || -> () {
-    //     sleep(Duration::from_secs(1));
-    //     let _local_window = tauri::WindowBuilder::new(
-    //                 &handle,
-    //                 "local",
-    //                 tauri::WindowUrl::External("https://developer.huawei.com/consumer/cn/doc/development/app/agc-help-releasenotes-0000001150208779#section20301321537".parse().unwrap()),
-    //             )
-    //             .maximized(true)
-    //             // .inner_size(400.0, 600.0)
-    //             .title("版本更新-公告")
-    //             .build().unwrap();
-    // });
-    Ok(())
-}
 
 pub fn check_status(app: &mut tauri::App, status: bool) {
     if status {
