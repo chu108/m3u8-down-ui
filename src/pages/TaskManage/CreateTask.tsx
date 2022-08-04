@@ -3,7 +3,7 @@ import model from "./model";
 import { useSnapshot } from "valtio";
 import { getNow } from "../../utils";
 
-const DEFAULT_TASK = { url: "http://1257120875.vod2.myqcloud.com/0ef121cdvodtransgzp1257120875/3055695e5285890780828799271/v.f230.m3u8", output: "11.MP4" };
+const DEFAULT_TASK = { url: "https://cdn7.caoliqi.com:65/20220223/O8AvdeJx/index.m3u8", output: "11.MP4" };
 
 const CreateTask: React.FC = () => {
   const state = useSnapshot(model);

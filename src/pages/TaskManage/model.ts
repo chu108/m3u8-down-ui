@@ -29,7 +29,7 @@ subscribeKey(model, "list", (list) => {
   const newList = list.map((task) => {
     if (task.status === undefined) {
       hasNewTask = true;
-      invoke("downFile", { filePath: task.url, output: task.output }).then(
+      invoke("down_file", { filePath: task.url, output: task.output }).then(
         (response) => console.log(response)
       );
       task.status = 0;

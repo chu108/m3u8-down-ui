@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
 
 use crate::vsd::args::Quality;
 use crate::vsd::utils::{format_bytes, select};

@@ -1,7 +1,6 @@
 use std::io::Write;
 
 use anyhow::{bail, Result};
-use kdam::term::Colorizer;
 
 pub fn format_bytes(bytesval: usize) -> (String, String, String) {
     let mut val = bytesval as f32;
