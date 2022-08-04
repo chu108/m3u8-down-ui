@@ -9,9 +9,10 @@ mod menu;
 
 fn main() {
     tauri::Builder::default()
-        .on_page_load(move |_window, _payload| {
+        .on_page_load(move |window, _payload| {
             println!("on_page_load........................");
-            handle::up_watch(_window);
+            handle::up_watch(window.clone());
+            handle::task_count(window.clone());
         })
         .setup(move |_app| {
             println!("setup........................");

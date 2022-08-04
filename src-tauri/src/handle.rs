@@ -54,6 +54,21 @@ pub fn down_watch(window: Window) {
     });
 }
 
+pub fn task_count(window: Window) {
+    thread::spawn(move || -> () {
+        println!("监听等待任务数...");
+        loop {
+            window.emit(
+                "task_count",
+                Payload {
+                    message: TASK.read().unwrap().len().to_string()
+                },
+            ).unwrap();
+            sleep(time::Duration::from_secs(1));
+        }
+    });
+}
+
 //监听下载任务
 pub fn up_watch(window: Window) {
     thread::spawn(move || -> () {
