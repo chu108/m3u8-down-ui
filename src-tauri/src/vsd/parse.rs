@@ -30,14 +30,11 @@ pub fn master(
     let mut res_band: HashMap<&str, (usize, usize)> = HashMap::new();
 
     for (i, variant) in master.variants.iter().enumerate() {
-        let bandwidth = variant.bandwidth.parse::<usize>().context(format!(
-            "Couldn't parse bandwidth of variant playlist at index {}.",
-            i
-        ))?;
+        let bandwidth = variant.bandwidth as usize;
         let band_fmt = format_bytes(bandwidth);
 
         if let Some(resolution) = &variant.resolution {
-            let res_fmt = match resolution.as_str() {
+            let res_fmt = match format!("{}x{}", resolution, bandwidth).as_str() {
                 "256x144" => "144p",
                 "426x240" => "240p",
                 "640x360" => "360p",
@@ -46,7 +43,7 @@ pub fn master(
                 "1920x1080" => "1080p",
                 "2560x1140" => "2K",
                 "3840x2160" => "4K",
-                _ => resolution.as_str(),
+                _ => "480p",
             };
 
             if let Some(pband) = res_band.get(res_fmt) {
@@ -102,21 +99,7 @@ pub fn master(
 
             for (i, variant) in master.variants.iter().enumerate() {
                 if let Some(resolution) = &variant.resolution {
-                    let quality = resolution
-                        .split("x")
-                        .map(|x| {
-                            x.parse::<usize>().expect(&format!(
-                                "Couldn't parse resolution of variant playlist at index {}.",
-                                i
-                            ))
-                        })
-                        .collect::<Vec<usize>>()
-                        .iter()
-                        .sum::<usize>()
-                        + variant.bandwidth.parse::<usize>().context(format!(
-                            "Couldn't parse bandwidth of variant playlist at index {}.",
-                            i
-                        ))?;
+                    let quality = (resolution.width + resolution.height) + variant.bandwidth;
 
                     if quality > factor {
                         factor = quality;

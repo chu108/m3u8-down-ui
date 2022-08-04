@@ -70,6 +70,7 @@ dependencies = [
  "clap",
  "headless_chrome",
  "kdam",
+ "lazy_static",
  "m3u8-rs",
  "once_cell",
  "openssl",
@@ -347,6 +348,19 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "chrono"
+version = "0.4.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73"
+dependencies = [
+ "libc",
+ "num-integer",
+ "num-traits",
+ "time 0.1.44",
+ "winapi",
+]
 
 [[package]]
 name = "clap"
@@ -1949,10 +1963,11 @@ dependencies = [
 
 [[package]]
 name = "m3u8-rs"
-version = "4.0.0"
+version = "5.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c27f4a86278e7d10f93c8c97f0191f85a071a45fa4245c261539465729c6d947"
+checksum = "2b0492068b5c5d8e73c4f02806db5e3e695a2e0c7c75721c46bb55445c4573e3"
 dependencies = [
+ "chrono",
  "nom",
 ]
 

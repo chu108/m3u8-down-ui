@@ -445,7 +445,7 @@ impl DownloadState {
             }
 
             if let Some(m3u8_key) = &segment.key {
-                if m3u8_key.method == "SAMPLE-AES" {
+                if m3u8_key.method == m3u8_rs::KeyMethod::SampleAES {
                     bail!("SAMPLE-AES encrypted playlists are not supported.")
                 }
             }
@@ -595,8 +595,6 @@ impl DownloadState {
                 "File {} not downloaded successfully.",
                 tempfile.colorize("bold red")
             );
-            // println!("File {} not downloaded successfully.",tempfile.colorize("bold red"));
-            // return Ok(());
         }
 
         Ok(())
@@ -634,32 +632,30 @@ impl DownloadState {
                 args.join(" ").colorize("cyan")
             );
 
-            let code = std::process::Command::new("ffmpeg")
+            let _code = std::process::Command::new("ffmpeg")
                 .args(args)
                 .stderr(std::process::Stdio::null())
-                .spawn()?
-                .wait()?;
-
-            if !code.success() {
-                println!("FFMPEG exited with code {}.", code.code().unwrap_or(1));
-                return Ok(());
-                // bail!("FFMPEG exited with code {}.", code.code().unwrap_or(1))
-            }
-
+                .output()?;
+            
+            // if !code.success() {
+            //     bail!("FFMPEG exited with code {}.", code.code().unwrap_or(1))
+            // }
+            
             if let Some(audio) = &self.progress.audio {
                 std::fs::remove_file(&audio.file)?;
             }
-
+            
             if let Some(subtitle) = &self.progress.subtitle {
                 std::fs::remove_file(&subtitle.file)?;
             }
-
+            
             std::fs::remove_file(&self.progress.stream.file)?;
         }
-
+        
         if std::path::Path::new(&self.progress.json_file).exists() {
             std::fs::remove_file(&self.progress.json_file)?;
         }
+        
         Ok(())
     }
 }

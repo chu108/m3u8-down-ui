@@ -72,5 +72,6 @@ pub fn down(url: String, output: String) -> Result<(), anyhow::Error> {
     let segments = downloader.segments()?;
     downloader.download(&segments, downloader.tempfile())?;
     downloader.transmux_trancode()?;
+    println!("down finish。。。。。");
     Ok(())
 }

@@ -5,13 +5,17 @@ use std::{
     fs::{self, File},
     thread,
     thread::sleep,
-    sync::RwLock, collections::HashMap
+    sync::{RwLock, mpsc::{self, Sender, Receiver}, Mutex}
 };
 use tauri::{Manager, Window};
 
-pub static TASK: Lazy<RwLock<HashMap<String, Progress>>> = Lazy::new(|| {
-    let prog = HashMap::new();
-    RwLock::new(prog)
+// pub static TASK: Lazy<Mutex<(Sender<Progress>, Receiver<Progress>)>> = Lazy::new(|| {
+//     Mutex::new(mpsc::channel())
+// });
+
+pub static TASK: Lazy<RwLock<Vec<Progress>>> = Lazy::new(|| {
+    let arr = Vec::new();
+    RwLock::new(arr)
 });
 
 #[tauri::command]
@@ -29,20 +33,14 @@ pub fn downWatch(window: Window) {
         println!("下载进度...");
         loop {
             let progress = vsd::PROGMAP.read().unwrap().to_json();
-            // println!("进度：{}", progress);
-            window
-                .emit(
-                    "downing",
-                    Payload {
-                        message: progress
-                    },
-                )
-                .unwrap();
+            println!("进度：{}", progress);
+            window.emit(
+                "downing",
+                Payload {
+                    message: progress
+                },
+            ).unwrap();
             if vsd::PROGMAP.read().unwrap().finish() || vsd::PROGMAP.read().unwrap().err != "" {
-                //队列中的数据
-                if TASK.write().unwrap().contains_key(&vsd::PROGMAP.read().unwrap().url) {
-                    TASK.write().unwrap().remove(&vsd::PROGMAP.read().unwrap().url).unwrap();
-                }
                 //清空进度
                 vsd::PROGMAP.write().unwrap().clear();
                 if vsd::PROGMAP.read().unwrap().err != "" {
@@ -50,7 +48,6 @@ pub fn downWatch(window: Window) {
                 } else {
                     println!("下载完成");
                 }
-                
                 return;
             }
             sleep(time::Duration::from_secs(1));
@@ -63,26 +60,30 @@ pub fn upWatch(window: Window) {
     thread::spawn(move || -> () {
         println!("开始监听下载任务...");
         loop {
+            //channel方式
+            // let task:Progress;
+            // {
+            //     task = TASK.lock().unwrap().1.recv().unwrap();
+            // }
+            // println!("开始下载,Url:{}, Output:{}", task.url.clone(), task.output.clone());
+            // downWatch(window.clone());
+            // match down(task.url.clone(), task.output.clone()) {
+            //     Ok(_) => println!("下载成功"),
+            //     Err(e) => {
+            //         vsd::PROGMAP.write().unwrap().err = format!("{}", e);
+            //     }
+            // }
+            
+            //数组方式
             if TASK.read().unwrap().len() > 0 {
-                for (key, task) in TASK.read().unwrap().iter() {
-                    if task.total == 0 && vsd::PROGMAP.read().unwrap().url == "" {
-                        println!("开始下载,Url:{}, Output:{}", task.url.clone(), task.output.clone());
-                        downWatch(window.clone());
-                        match down(task.url.clone(), task.output.clone()) {
-                            Ok(_) => println!("下载成功"),
-                            Err(e) => {
-                                vsd::PROGMAP.write().unwrap().err = format!("{}", e);
-                            }
-                        }
+                let task = TASK.write().unwrap().remove(0);
+                println!("开始下载,Url:{}, Output:{}", task.url.clone(), task.output.clone());
+                downWatch(window.clone());
+                match down(task.url.clone(), task.output.clone()) {
+                    Ok(_) => println!("下载成功"),
+                    Err(e) => {
+                        vsd::PROGMAP.write().unwrap().err = format!("{}", e);
                     }
-                    println!("-----------循环次数:{}", key);
-                    //测试----------------------------
-                    // downWatch(window.clone());
-                    // println!("开始下载,Url:{}, Output:{}", task.url.clone(), task.output.clone());
-                    // vsd::PROGMAP.write().unwrap().url = "http://1257120875.vod2.myqcloud.com/0ef121cdvodtransgzp1257120875/3055695e5285890780828799271/v.f230.m3u8".to_string();
-                    // vsd::PROGMAP.write().unwrap().total = 100;
-                    // vsd::PROGMAP.write().unwrap().downloaded = 100;
-                    // vsd::PROGMAP.write().unwrap().err = format!("下载完成{}", key);
                 }
             }
             sleep(time::Duration::from_secs(2));
@@ -95,7 +96,8 @@ pub fn upWatch(window: Window) {
 pub fn downFile(filePath: &str, output: &str) -> String {
     let mut prog = Progress::new();
     prog.set_url_out(filePath.to_string(), output.to_string());
-    TASK.write().unwrap().insert(filePath.to_string(), prog);
+    TASK.write().unwrap().push(prog);
+    // TASK.lock().unwrap().0.clone().send(prog);
     println!("添加任务到队列：{}", filePath);
     "ok".to_string()
 }

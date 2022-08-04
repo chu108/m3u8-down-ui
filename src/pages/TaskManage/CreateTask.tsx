@@ -12,7 +12,7 @@ const CreateTask: React.FC = () => {
 
   return (
     <>
-      <Button shadow auto onClick={() => (model.newTask = DEFAULT_TASK)}>
+      <Button shadow auto onClick={() => (model.newTask = {...DEFAULT_TASK})}>
         新建任务
       </Button>
       {state.newTask && (
@@ -35,7 +35,7 @@ const CreateTask: React.FC = () => {
               aria-label="资源地址"
               color="primary"
               size="lg"
-              value={model.newTask!.url}
+              value={state.newTask!.url}
               placeholder="资源地址"
               onChange={(e) => (model.newTask!.url = e.target.value)}
             />
@@ -44,7 +44,7 @@ const CreateTask: React.FC = () => {
               bordered
               fullWidth
               aria-label="输出文件"
-              value={model.newTask!.output}
+              value={state.newTask!.output}
               color="primary"
               size="lg"
               placeholder="文件保存为"

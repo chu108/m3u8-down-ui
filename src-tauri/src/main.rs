@@ -6,7 +6,6 @@
 mod event;
 mod handle;
 mod menu;
-mod window;
 
 fn main() {
     tauri::Builder::default()
@@ -22,7 +21,6 @@ fn main() {
         .on_system_tray_event(event::handler)
         .invoke_handler(tauri::generate_handler![
             handle::greet,
-            // handle::download,
             handle::close_splashscreen,
             handle::update_maximized,
             handle::downFile

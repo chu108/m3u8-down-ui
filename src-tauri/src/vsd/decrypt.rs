@@ -20,18 +20,18 @@ impl HlsDecrypt {
             None
         };
 
-        match key.method.as_str() {
-            "NONE" => Self {
+        match key.method {
+            m3u8_rs::KeyMethod::None => Self {
                 key: vec![],
                 iv: iv,
                 method: HlsEncryptionMethod::None,
             },
-            "AES-128" => Self {
+            m3u8_rs::KeyMethod::AES128 => Self {
                 key: key_content,
                 iv: iv,
                 method: HlsEncryptionMethod::Aes128,
             },
-            "SAMPLE-AES" => Self {
+            m3u8_rs::KeyMethod::SampleAES => Self {
                 key: key_content,
                 iv: iv,
                 method: HlsEncryptionMethod::SampleAes,
