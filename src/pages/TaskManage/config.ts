@@ -1,5 +1,4 @@
-import dayjs from "dayjs";
-import { getNow } from "../../utils";
+import { getNow } from '../../utils';
 
 export enum TaskStatus {
   successful = 100,
@@ -8,18 +7,18 @@ export enum TaskStatus {
 
 export const columns = [
   {
-    key: "createAt",
-    label: "创建时间",
+    key: 'createAt',
+    label: '创建时间',
     width: 180,
   },
   {
-    key: "url",
-    label: "资源地址",
+    key: 'output',
+    label: '文件',
   },
   {
-    key: "status",
-    label: "状态",
-    width: 100,
+    key: 'status',
+    label: '状态',
+    width: 180,
   },
 ];
 
@@ -37,12 +36,14 @@ export const rows = [
   // },
   {
     createAt: now,
-    url: "task3",
+    url: 'https://xxxx',
+    output: 'demo1.mp4',
     status: TaskStatus.successful,
   },
   {
     createAt: now,
-    url: "task4",
+    url: 'https://yyyyy',
+    output: 'demo2.mp4',
     status: TaskStatus.failed,
   },
 ];

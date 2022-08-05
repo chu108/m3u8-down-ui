@@ -1,9 +1,23 @@
-import { Loading, Progress, Table, Text } from "@nextui-org/react";
-import React, { ReactNode } from "react";
-import { useSnapshot } from "valtio";
-import { columns, TaskStatus } from "./config";
-import model from "./model";
-import { StyledBadge } from "./StyledBadge";
+import { Loading, Progress, Table, Tooltip, Text } from '@nextui-org/react';
+import React, { ReactNode } from 'react';
+import { useSnapshot } from 'valtio';
+import { columns, TaskStatus } from './config';
+import model from './model';
+import { StyledBadge } from './StyledBadge';
+
+function renderOutput(task: Task) {
+  return (
+    <Tooltip content={task.url} color="secondary">
+      <Text
+        css={{
+          textGradient: '45deg, $purple600 -20%, $pink600 100%',
+        }}
+      >
+        {task.output}
+      </Text>
+    </Tooltip>
+  );
+}
 
 function renderTaskStatus(status?: number | TaskStatus) {
   switch (status) {
@@ -15,8 +29,8 @@ function renderTaskStatus(status?: number | TaskStatus) {
     case TaskStatus.failed:
       return <StyledBadge type="failed">下载失败</StyledBadge>;
     default:
-      if (status < 100) {
-        return <Progress value={Number(status)} color="gradient" />;
+      if (status < 1) {
+        return <Progress value={Number(status) * 100} color="gradient" />;
       }
       return status;
   }
@@ -29,12 +43,12 @@ const TaskTable: React.FC = () => {
       aria-label="Example table with dynamic content"
       fixed
       css={{
-        height: "auto",
-        minWidth: "100%",
+        height: 'auto',
+        minWidth: '100%',
       }}
     >
       <Table.Header columns={columns}>
-        {(column) => (
+        {column => (
           <Table.Column key={column.key} css={{ width: column.width }}>
             {column.label}
           </Table.Column>
@@ -43,10 +57,13 @@ const TaskTable: React.FC = () => {
       <Table.Body>
         {state.list.map((task, index) => (
           <Table.Row key={index}>
-            {(columnKey) => {
+            {columnKey => {
               let v: ReactNode = task[columnKey as keyof typeof task];
-              if (columnKey === "status") {
+              if (columnKey === 'status') {
                 v = renderTaskStatus(v as TaskStatus);
+              }
+              if (columnKey === 'output') {
+                v = renderOutput(task);
               }
               return <Table.Cell>{v}</Table.Cell>;
             }}

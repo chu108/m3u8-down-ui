@@ -1,9 +1,12 @@
-import { Button, Input, Modal, Text } from "@nextui-org/react";
-import model from "./model";
-import { useSnapshot } from "valtio";
-import { getNow } from "../../utils";
+import { Button, Input, Modal, Text } from '@nextui-org/react';
+import model from './model';
+import { useSnapshot } from 'valtio';
+import { getNow } from '../../utils';
 
-const DEFAULT_TASK = { url: "https://cdn7.caoliqi.com:65/20220223/O8AvdeJx/index.m3u8", output: "11.MP4" };
+const DEFAULT_TASK = {
+  url: 'https://cdn7.caoliqi.com:65/20220223/O8AvdeJx/index.m3u8',
+  output: '11.MP4',
+};
 
 const CreateTask: React.FC = () => {
   const state = useSnapshot(model);
@@ -12,7 +15,7 @@ const CreateTask: React.FC = () => {
 
   return (
     <>
-      <Button shadow auto onClick={() => (model.newTask = {...DEFAULT_TASK})}>
+      <Button shadow auto onClick={() => (model.newTask = { ...DEFAULT_TASK })}>
         新建任务
       </Button>
       {state.newTask && (
@@ -37,7 +40,7 @@ const CreateTask: React.FC = () => {
               size="lg"
               value={state.newTask!.url}
               placeholder="资源地址"
-              onChange={(e) => (model.newTask!.url = e.target.value)}
+              onChange={e => (model.newTask!.url = e.target.value)}
             />
             <Input
               clearable
@@ -48,7 +51,7 @@ const CreateTask: React.FC = () => {
               color="primary"
               size="lg"
               placeholder="文件保存为"
-              onChange={(e) => (model.newTask!.output = e.target.value)}
+              onChange={e => (model.newTask!.output = e.target.value)}
             />
           </Modal.Body>
           <Modal.Footer>
@@ -57,13 +60,13 @@ const CreateTask: React.FC = () => {
             </Button>
             <Button
               auto
-              disabled={!state.newTask?.url}
+              disabled={!state.newTask?.url || !state.newTask?.output}
               onClick={() => {
                 const { url, output } = model.newTask as Task;
                 model.list = [
                   {
                     url,
-                    output: output || "m3u8下载器-未命名文件.mp4",
+                    output: output || 'm3u8下载器-未命名文件.mp4',
                     createAt: getNow(),
                   },
                   ...model.list,
