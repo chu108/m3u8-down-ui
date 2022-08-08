@@ -1,4 +1,11 @@
-import { Loading, Progress, Table, Tooltip, Text } from '@nextui-org/react';
+import {
+  Loading,
+  Progress,
+  Table,
+  Tooltip,
+  Text,
+  Spacer,
+} from '@nextui-org/react';
 import React, { ReactNode } from 'react';
 import { useSnapshot } from 'valtio';
 import { columns, TaskStatus } from './config';
@@ -20,20 +27,27 @@ function renderOutput(task: Task) {
 }
 
 function renderTaskStatus(status?: number | TaskStatus) {
-  switch (status) {
-    case undefined:
-    case 0:
-      return <Loading size="sm" />;
-    case TaskStatus.successful:
-      return <StyledBadge type="successful">已完成</StyledBadge>;
-    case TaskStatus.failed:
-      return <StyledBadge type="failed">下载失败</StyledBadge>;
-    default:
-      if (status < 1) {
-        return <Progress value={Number(status) * 100} color="gradient" />;
-      }
-      return status;
+  if (status === undefined || status === 0) {
+    return <Loading size="sm" />;
   }
+  if (status === TaskStatus.successful) {
+    return <StyledBadge type="successful">已完成</StyledBadge>;
+  }
+  if (typeof status === 'string') {
+    return (
+      <Tooltip content={status} color="error">
+        <StyledBadge type="failed">下载失败</StyledBadge>
+      </Tooltip>
+    );
+  }
+  return (
+    //
+    //{' '}
+    <div>
+      <Text>{`${(status * 100).toFixed(2)}%`}</Text>
+      <Progress value={Number(status) * 100} color="gradient" />
+    </div>
+  );
 }
 
 const TaskTable: React.FC = () => {

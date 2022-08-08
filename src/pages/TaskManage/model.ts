@@ -1,6 +1,6 @@
 import { proxy } from 'valtio';
 import { subscribeKey } from 'valtio/utils';
-import { rows, TaskStatus } from './config';
+import { rows } from './config';
 import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
 
@@ -61,7 +61,7 @@ listen('downing', event => {
       const task = model.list[index];
 
       if (err) {
-        task!.status = TaskStatus.failed;
+        task!.status = err;
         console.error(err);
         return;
       }

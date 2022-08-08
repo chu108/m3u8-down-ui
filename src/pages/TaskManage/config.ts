@@ -1,8 +1,7 @@
 import { getNow } from '../../utils';
 
 export enum TaskStatus {
-  successful = 100,
-  failed = -1,
+  successful = 1,
 }
 
 export const columns = [
@@ -44,6 +43,6 @@ export const rows = [
     createAt: now,
     url: 'https://yyyyy',
     output: 'demo2.mp4',
-    status: TaskStatus.failed,
+    status: '失败～～～',
   },
 ];
