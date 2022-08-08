@@ -32,7 +32,7 @@ pub fn down_watch(window: Window) {
         println!("下载进度...");
         loop {
             let progress = vsd::PROGMAP.read().unwrap().to_json();
-            // println!("进度：{}", progress);
+            println!("进度：{}", progress);
             window.emit(
                 "downing",
                 Payload {

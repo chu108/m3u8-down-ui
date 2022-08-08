@@ -25,8 +25,7 @@ impl Progress{
         Progress{url:"".to_string(), total:0, downloaded:0,err:"".to_string(), output:"".to_string()}
     }
 
-    pub fn init(&mut self, url: String, total: usize, downloaded: usize) {
-        self.url = url;
+    pub fn init(&mut self, total: usize, downloaded: usize) {
         self.total = total;
         self.downloaded = downloaded;
         self.err = String::from("");
@@ -68,8 +67,9 @@ pub static PROGMAP: Lazy<RwLock<Progress>> = Lazy::new(|| {
 });
 
 pub fn down(url: String, output: String) -> Result<(), anyhow::Error> {
-    let mut downloader = core::DownloadState::new_url(url, output)?;
+    let mut downloader = core::DownloadState::new_url(url.clone(), output)?;
     let segments = downloader.segments()?;
+    PROGMAP.write().unwrap().url = url.clone();
     downloader.download(&segments, downloader.tempfile())?;
     downloader.transmux_trancode()?;
     println!("down finish。。。。。");

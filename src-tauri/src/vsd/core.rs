@@ -431,7 +431,7 @@ impl DownloadState {
         PROGMAP
             .write()
             .unwrap()
-            .init(self.args.input.clone(), total, 0);
+            .init(total, 0);
 
         for (i, segment) in segments.iter().enumerate() {
             if self.args.resume {
