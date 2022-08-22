@@ -21,14 +21,14 @@ function renderOutput(task: Task) {
 
 function renderTaskStatus(status?: number | TaskStatus) {
   if (status === undefined || status === 0) {
-    return <Loading size="sm" />;
+    return <StyledBadge type="successful">等待中</StyledBadge>;
   }
   if (status === TaskStatus.successful) {
     return <StyledBadge type="successful">已完成</StyledBadge>;
   }
   if (typeof status === 'string') {
     return (
-      <Tooltip content={status} color="error">
+      <Tooltip content={status} color="error" placement="topEnd">
         <StyledBadge type="failed">下载失败</StyledBadge>
       </Tooltip>
     );
@@ -79,7 +79,7 @@ const TaskTable: React.FC = () => {
         shadow
         noMargin
         align="center"
-        total={Math.ceil(model.list.length / 8)}
+        total={Math.ceil(model.list.length / 8) || 1}
         rowsPerPage={8}
       />
     </Table>

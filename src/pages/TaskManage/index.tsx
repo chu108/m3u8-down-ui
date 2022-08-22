@@ -2,6 +2,7 @@ import { Text } from '@nextui-org/react';
 import React from 'react';
 import CreateTask from './CreateTask';
 import GlobalConfig from './GlobalConfig';
+import RemoveHistory from './RemoveHistory';
 import TaskTable from './TaskTable';
 
 const iStyle = {
@@ -19,6 +20,7 @@ const TaskManage: React.FC = () => {
             h4
             css={{
               marginLeft: 10,
+              fontSize: 20,
               textGradient: '45deg, $blue600 -20%, $purple600 100%',
             }}
           >
@@ -28,6 +30,7 @@ const TaskManage: React.FC = () => {
         <div style={iStyle}>
           <CreateTask />
           <GlobalConfig />
+          <RemoveHistory />
         </div>
       </div>
       <TaskTable />

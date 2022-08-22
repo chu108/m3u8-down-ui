@@ -21,6 +21,12 @@ try {
   const data = localStorage.getItem(TASK_STATE);
   if (data) {
     initialData = Object.assign(initialData, JSON.parse(data));
+    initialData.list = initialData.list?.map(task => {
+      if (typeof task.status === 'number' && task.status < 1) {
+        task.status = '下载中断';
+      }
+      return task;
+    });
   }
 } catch (error) {
   console.error(error);

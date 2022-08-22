@@ -2,7 +2,7 @@ type Task = {
   url: string;
   output: string;
   createAt?: string;
-  status?: number | 'waiting';
+  status?: number | string;
 };
 
 type GlobalConfig = {
