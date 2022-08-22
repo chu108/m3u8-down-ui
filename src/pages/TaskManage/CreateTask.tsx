@@ -3,10 +3,12 @@ import model from './model';
 import { useSnapshot } from 'valtio';
 import { getNow } from '../../utils';
 
-const DEFAULT_TASK = {
-  url: 'https://cdn7.caoliqi.com:65/20220223/O8AvdeJx/index.m3u8',
-  output: '11.MP4',
-};
+function genNewTask() {
+  return {
+    url: 'https://cdn7.caoliqi.com:65/20220223/O8AvdeJx/index.m3u8',
+    output: `${Date.now()}.mp4`,
+  };
+}
 
 const CreateTask: React.FC = () => {
   const state = useSnapshot(model);
@@ -15,7 +17,7 @@ const CreateTask: React.FC = () => {
 
   return (
     <>
-      <Button shadow auto onClick={() => (model.newTask = { ...DEFAULT_TASK })}>
+      <Button shadow auto onClick={() => (model.newTask = genNewTask())}>
         新建任务
       </Button>
       {state.newTask && (
