@@ -1,15 +1,24 @@
 import { proxy } from 'valtio';
-import { subscribeKey } from 'valtio/utils';
+import { subscribeKey, watch } from 'valtio/utils';
 import { rows } from './config';
 import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
 
+export const DEFAULT_SETTING: GlobalConfig = {
+  thread: 5,
+  proxyAddress: '',
+};
+
+const TASK_STATE = 'TASK_STATE';
+
 let initialData = {
   newTask: null as Task | null,
+  settings: DEFAULT_SETTING,
+  activitySettings: null as GlobalConfig | null,
   list: rows as Task[],
 };
 try {
-  const data = localStorage.getItem('TASK_STATE');
+  const data = localStorage.getItem(TASK_STATE);
   if (data) {
     initialData = Object.assign(initialData, JSON.parse(data));
   }
@@ -29,9 +38,12 @@ subscribeKey(model, 'list', list => {
   const newList = list.map(task => {
     if (task.status === undefined) {
       hasNewTask = true;
-      invoke('down_file', { filePath: task.url, output: task.output }).then(
-        response => console.log(response),
-      );
+      invoke('down_file', {
+        filePath: task.url,
+        output: task.output,
+        thread: model.settings.thread || 5,
+        proxyAddress: model.settings.proxyAddress,
+      }).then(response => console.log(response));
       task.status = 0;
     }
     return task;
@@ -75,6 +87,10 @@ listen('downing', event => {
   } catch (error) {
     console.error(error);
   }
+});
+
+watch(get => {
+  localStorage.setItem(TASK_STATE, JSON.stringify(get(model)));
 });
 
 export default model;

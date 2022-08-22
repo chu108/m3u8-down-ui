@@ -1,11 +1,4 @@
-import {
-  Loading,
-  Progress,
-  Table,
-  Tooltip,
-  Text,
-  Spacer,
-} from '@nextui-org/react';
+import { Loading, Progress, Table, Tooltip, Text } from '@nextui-org/react';
 import React, { ReactNode } from 'react';
 import { useSnapshot } from 'valtio';
 import { columns, TaskStatus } from './config';
@@ -41,8 +34,6 @@ function renderTaskStatus(status?: number | TaskStatus) {
     );
   }
   return (
-    //
-    //{' '}
     <div>
       <Text>{`${(status * 100).toFixed(2)}%`}</Text>
       <Progress value={Number(status) * 100} color="gradient" />

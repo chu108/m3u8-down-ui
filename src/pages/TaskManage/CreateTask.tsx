@@ -18,7 +18,7 @@ const CreateTask: React.FC = () => {
   return (
     <>
       <Button shadow auto onClick={() => (model.newTask = genNewTask())}>
-        新建任务
+        新建下载
       </Button>
       {state.newTask && (
         <Modal
@@ -33,6 +33,7 @@ const CreateTask: React.FC = () => {
             </Text>
           </Modal.Header>
           <Modal.Body>
+            <Text>资源地址</Text>
             <Input
               clearable
               bordered
@@ -44,6 +45,7 @@ const CreateTask: React.FC = () => {
               placeholder="资源地址"
               onChange={e => (model.newTask!.url = e.target.value)}
             />
+            <Text>文件保存为</Text>
             <Input
               clearable
               bordered
