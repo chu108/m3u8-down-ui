@@ -1,4 +1,4 @@
-use app::vsd::{self, down, Progress};
+use app::vsd::{self, down, Progress, args::Args};
 use once_cell::sync::Lazy;
 use core::time;
 use std::{
@@ -32,7 +32,7 @@ pub fn down_watch(window: Window) {
         println!("下载进度...");
         loop {
             let progress = vsd::PROGMAP.read().unwrap().to_json();
-            println!("进度：{}", progress);
+            // println!("进度：{}", progress);
             window.emit(
                 "downing",
                 Payload {
@@ -93,7 +93,12 @@ pub fn up_watch(window: Window) {
                 let task = TASK.write().unwrap().remove(0);
                 println!("开始下载,Url:{}, Output:{}", task.url.clone(), task.output.clone());
                 down_watch(window.clone());
-                match down(task.url.clone(), task.output.clone()) {
+                let mut arg = Args::new();
+                arg.input = task.url;
+                arg.output = Some(task.output);
+                arg.threads = task.threads;
+                arg.proxy_address = task.proxy_address;
+                match down(arg) {
                     Ok(_) => println!("下载成功"),
                     Err(e) => {
                         vsd::PROGMAP.write().unwrap().err = format!("{}", e);
@@ -107,8 +112,19 @@ pub fn up_watch(window: Window) {
 
 //下载文件
 #[tauri::command]
-pub fn down_file(file_path: &str, output: &str) -> String {
+pub fn down_file(
+    file_path: &str, 
+    output: &str,
+    thread: u8,
+    proxy_address: String
+) -> String {
     let mut prog = Progress::new();
+    prog.url = file_path.to_string();
+    prog.output = output.to_string();
+    prog.threads = thread;
+    if !proxy_address.is_empty() {
+        prog.proxy_address = Some(proxy_address);
+    }
     prog.set_url_out(file_path.to_string(), output.to_string());
     TASK.write().unwrap().push(prog);
     // TASK.lock().unwrap().0.clone().send(prog);

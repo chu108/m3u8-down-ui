@@ -16,24 +16,7 @@ pub struct DownloadState {
 }
 
 impl DownloadState {
-    pub fn new_url(url: String, output: String) -> Result<Self> {
-        let args = crate::vsd::args::Args{
-            input:url,
-            output:Some(output),
-            baseurl:None,
-            quality:crate::vsd::args::Quality::Select,
-            threads:5,
-            retry_count:15,
-            raw_prompts:false,
-            resume:false,
-            alternative:false,
-            skip:false,
-            header:vec![],
-            user_agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36".to_string(),
-            proxy_address:None,
-            enable_cookies:false,
-            cookies:vec![],
-        };
+    pub fn new_by_arg(args: crate::vsd::args::Args) -> Result<Self> {
         Self::new_obj(args)
     }
 
