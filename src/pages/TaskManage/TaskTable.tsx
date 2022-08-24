@@ -28,7 +28,7 @@ function renderTaskStatus(status?: number | TaskStatus) {
   }
   if (typeof status === 'string') {
     return (
-      <Tooltip content={status} color="error" placement="topEnd">
+      <Tooltip content={status} color="error" placement="left">
         <StyledBadge type="failed">下载失败</StyledBadge>
       </Tooltip>
     );
