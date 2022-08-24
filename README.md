@@ -13,16 +13,7 @@ m3u8-down-ui是基于 Tauri + React 框架开发的一款可以下载、HLS视�
 
 <div align="center">
     <br>
-    <img width="739" src="https://s3.bmp.ovh/imgs/2022/08/24/1e043014a8f4db1d.png" alt="M3U8-Downloader">
-    <br>
-    <br>
-    <img width="739" src="https://s3.bmp.ovh/imgs/2022/08/24/804960505d78532a.png" alt="M3U8-Downloader">
-    <br>
-    <br>
-    <img width="739" src="https://s3.bmp.ovh/imgs/2022/08/24/706bc17f3671f9d5.png" alt="M3U8-Downloader">
-    <br>
-    <br>
-    <img width="739" src="https://s3.bmp.ovh/imgs/2022/08/24/6227c46283829488.png" alt="M3U8-Downloader">
+    <img width="739" src="https://s3.bmp.ovh/imgs/2022/08/24/06e90f775cc6dce7.gif" alt="M3U8-Downloader">
     <br>
 </div>
 
