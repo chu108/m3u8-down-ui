@@ -32,3 +32,9 @@ m3u8-down-ui是基于 Tauri + React 框架开发的一款可以下载、HLS视�
 
 # 依赖工具
 #### FFmpeg 需要预先安装
+
+# 参考项目
+部分代码，使用了 [VSD](https://github.com/clitic/vsd) 包，去掉了不需要功能并升级了所有依赖版本
+
+
+
